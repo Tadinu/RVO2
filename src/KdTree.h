@@ -38,8 +38,6 @@
  * @file  KdTree.h
  * @brief Declares the KdTree class.
  */
-
-#include <cstddef>
 #include <vector>
 
 namespace RVO {

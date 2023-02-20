@@ -38,8 +38,6 @@
  * @file  Agent.h
  * @brief Declares the Agent class.
  */
-
-#include <cstddef>
 #include <utility>
 #include <vector>
 

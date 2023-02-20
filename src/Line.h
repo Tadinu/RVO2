@@ -39,14 +39,13 @@
  * @brief Declares the Line class.
  */
 
-#include "Export.h"
 #include "Vector2.h"
 
 namespace RVO {
 /**
  * @brief Defines a directed line.
  */
-class RVO_EXPORT Line {
+class Line {
  public:
   /**
    * @brief Constructs a directed line instance.

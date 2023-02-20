@@ -38,21 +38,20 @@
  * @file  Vector2.h
  * @brief Declares and defines the Vector2 class.
  */
+#include <ostream>
 
-#include <iosfwd>
-
-#include "Export.h"
+// #include "Export.h"
 
 namespace RVO {
 /**
  * @brief A sufficiently small positive number.
  */
-RVO_EXPORT extern const float RVO_EPSILON;
+extern const float RVO_EPSILON;
 
 /**
  * @brief Defines a two-dimensional vector.
  */
-class RVO_EXPORT Vector2 {
+class Vector2 {
  public:
   /**
    * @brief Constructs and initializes a two-dimensional vector instance to
@@ -206,7 +205,7 @@ class RVO_EXPORT Vector2 {
  * @return    The scalar multiplication of the two-dimensional vector with the
  *            scalar value.
  */
-RVO_EXPORT Vector2 operator*(float scalar, const Vector2 &vector);
+Vector2 operator*(float scalar, const Vector2 &vector);
 
 /**
  * @relates        Vector2
@@ -218,8 +217,7 @@ RVO_EXPORT Vector2 operator*(float scalar, const Vector2 &vector);
  *                        output stream.
  * @return         A reference to the output stream.
  */
-RVO_EXPORT std::ostream &operator<<(std::ostream &stream,
-                                    const Vector2 &vector);
+std::ostream &operator<<(std::ostream &stream, const Vector2 &vector);
 
 /**
  * @relates   Vector2
@@ -227,7 +225,7 @@ RVO_EXPORT std::ostream &operator<<(std::ostream &stream,
  * @param[in] vector The two-dimensional vector whose length is to be computed.
  * @return    The length of the two-dimensional vector.
  */
-RVO_EXPORT float abs(const Vector2 &vector);
+float abs(const Vector2 &vector);
 
 /**
  * @relates   Vector2
@@ -236,7 +234,7 @@ RVO_EXPORT float abs(const Vector2 &vector);
  *                   computed.
  * @return    The squared length of the two-dimensional vector.
  */
-RVO_EXPORT float absSq(const Vector2 &vector);
+float absSq(const Vector2 &vector);
 
 /**
  * @relates   Vector2
@@ -246,7 +244,7 @@ RVO_EXPORT float absSq(const Vector2 &vector);
  * @param[in] vector2 The bottom row of the two-dimensional square matrix.
  * @return    The determinant of the two-dimensional square matrix.
  */
-RVO_EXPORT float det(const Vector2 &vector1, const Vector2 &vector2);
+float det(const Vector2 &vector1, const Vector2 &vector2);
 
 /**
  * @brief     Computes the signed distance from a line connecting th specified
@@ -258,8 +256,8 @@ RVO_EXPORT float det(const Vector2 &vector1, const Vector2 &vector2);
  * @return    Positive when the point vector3 lies to the left of the line
  *            vector1-vector2.
  */
-RVO_EXPORT float leftOf(const Vector2 &vector1, const Vector2 &vector2,
-                        const Vector2 &vector3);
+float leftOf(const Vector2 &vector1, const Vector2 &vector2,
+             const Vector2 &vector3);
 
 /**
  * @relates   Vector2
@@ -269,7 +267,7 @@ RVO_EXPORT float leftOf(const Vector2 &vector1, const Vector2 &vector2,
  *                   computed.
  * @return    The normalization of the two-dimensional vector.
  */
-RVO_EXPORT Vector2 normalize(const Vector2 &vector);
+Vector2 normalize(const Vector2 &vector);
 } /* namespace RVO */
 
 #endif /* RVO_VECTOR2_H_ */

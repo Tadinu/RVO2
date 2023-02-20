@@ -39,8 +39,6 @@
  * @brief Declares the Obstacle class.
  */
 
-#include <cstddef>
-
 #include "Vector2.h"
 
 namespace RVO {

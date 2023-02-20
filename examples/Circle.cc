@@ -43,7 +43,6 @@
 #endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
 
 #include <cmath>
-#include <cstddef>
 #include <vector>
 
 #if RVO_OUTPUT_TIME_AND_POSITIONS

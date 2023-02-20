@@ -278,8 +278,6 @@ around a rectangular obstacle in the middle.
 @code{.cc}
 #include <RVO.h>
 
-#include <cstddef>
-
 namespace {
 void setupScenario(RVO::RVOSimulator *simulator) {
   // Specify global time step of the simulation.

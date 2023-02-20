@@ -39,10 +39,7 @@
  * @brief Declares and defines the RVOSimulator class.
  */
 
-#include <cstddef>
 #include <vector>
-
-#include "Export.h"
 
 namespace RVO {
 class Agent;
@@ -56,13 +53,13 @@ class Vector2;
  * @brief   Error value. A value equal to the largest unsigned integer that is
  *          returned in case of an error by functions in RVO::RVOSimulator.
  */
-RVO_EXPORT extern const std::size_t RVO_ERROR;
+extern const std::size_t RVO_ERROR;
 
 /**
  * @brief Defines the simulation. The main class of the library that contains
  *        all simulation functionality.
  */
-class RVO_EXPORT RVOSimulator {
+class RVOSimulator {
  public:
   /**
    * @brief Constructs a simulator instance.

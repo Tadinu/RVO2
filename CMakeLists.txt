@@ -69,11 +69,13 @@ set(RVO_LIBRARY RVO)
 set(RVO_NAME "RVO2 Library")
 set(RVO_HOMEPAGE_URL https://gamma.cs.unc.edu/RVO2/)
 
-set(CMAKE_CXX_STANDARD 98)
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+#SET(CMAKE_CXX_FLAGS "-stdlib=libstdc++")
 
 option(ENABLE_OPENMP "Enable OpenMP if available" OFF)
 
@@ -277,7 +279,7 @@ if(WARNINGS_AS_ERRORS)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(examples)
+#add_subdirectory(examples)
 add_subdirectory(doc)
 
 install(FILES LICENSE
