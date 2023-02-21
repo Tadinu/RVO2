@@ -31,8 +31,8 @@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_OBSTACLE_H_
-#define RVO_OBSTACLE_H_
+#ifndef RVO2_OBSTACLE_H_
+#define RVO2_OBSTACLE_H_
 
 /**
  * @file  Obstacle.h
@@ -41,7 +41,7 @@
 
 #include "Vector2.h"
 
-namespace RVO {
+namespace RVO2 {
 /**
  * @brief Defines static obstacles in the simulation.
  */
@@ -72,8 +72,8 @@ class Obstacle {
 
   friend class Agent;
   friend class KdTree;
-  friend class RVOSimulator;
+  friend class RVO2Simulator;
 };
-} /* namespace RVO */
+} /* namespace RVO2 */
 
-#endif /* RVO_OBSTACLE_H_ */
+#endif /* RVO2_OBSTACLE_H_ */

@@ -38,29 +38,29 @@
  *        position on the circle.
  */
 
-#ifndef RVO_OUTPUT_TIME_AND_POSITIONS
-#define RVO_OUTPUT_TIME_AND_POSITIONS 1
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#ifndef RVO2_OUTPUT_TIME_AND_POSITIONS
+#define RVO2_OUTPUT_TIME_AND_POSITIONS 1
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
 
 #include <cmath>
 #include <vector>
 
-#if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO2_OUTPUT_TIME_AND_POSITIONS
 #include <iostream>
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
 
 #if _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
 
-#include "RVO.h"
+#include "RVO2.h"
 
 namespace {
-const float RVO_TWO_PI = 6.28318530717958647692F;
+const float RVO2_TWO_PI = 6.28318530717958647692F;
 
 void setupScenario(
-    RVO::RVOSimulator *simulator,
-    std::vector<RVO::Vector2> &goals) { /* NOLINT(runtime/references) */
+    RVO2::RVO2Simulator *simulator,
+    std::vector<RVO2::Vector2> &goals) { /* NOLINT(runtime/references) */
   /* Specify the global time step of the simulation. */
   simulator->setTimeStep(0.25F);
 
@@ -72,14 +72,14 @@ void setupScenario(
   for (std::size_t i = 0U; i < 250U; ++i) {
     simulator->addAgent(
         200.0F *
-        RVO::Vector2(std::cos(static_cast<float>(i) * RVO_TWO_PI * 0.004F),
-                     std::sin(static_cast<float>(i) * RVO_TWO_PI * 0.004F)));
+        RVO2::Vector2(std::cos(static_cast<float>(i) * RVO2_TWO_PI * 0.004F),
+                      std::sin(static_cast<float>(i) * RVO2_TWO_PI * 0.004F)));
     goals.push_back(-simulator->getAgentPosition(i));
   }
 }
 
-#if RVO_OUTPUT_TIME_AND_POSITIONS
-void updateVisualization(RVO::RVOSimulator *simulator) {
+#if RVO2_OUTPUT_TIME_AND_POSITIONS
+void updateVisualization(RVO2::RVO2Simulator *simulator) {
   /* Output the current global time. */
   std::cout << simulator->getGlobalTime();
 
@@ -90,31 +90,31 @@ void updateVisualization(RVO::RVOSimulator *simulator) {
 
   std::cout << std::endl;
 }
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
 
-void setPreferredVelocities(RVO::RVOSimulator *simulator,
-                            const std::vector<RVO::Vector2> &goals) {
+void setPreferredVelocities(RVO2::RVO2Simulator *simulator,
+                            const std::vector<RVO2::Vector2> &goals) {
   /* Set the preferred velocity to be a vector of unit magnitude (speed) in the
    * direction of the goal. */
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif /* _OPENMP */
   for (int i = 0; i < static_cast<int>(simulator->getNumAgents()); ++i) {
-    RVO::Vector2 goalVector = goals[i] - simulator->getAgentPosition(i);
+    RVO2::Vector2 goalVector = goals[i] - simulator->getAgentPosition(i);
 
-    if (RVO::absSq(goalVector) > 1.0F) {
-      goalVector = RVO::normalize(goalVector);
+    if (RVO2::absSq(goalVector) > 1.0F) {
+      goalVector = RVO2::normalize(goalVector);
     }
 
     simulator->setAgentPrefVelocity(i, goalVector);
   }
 }
 
-bool reachedGoal(RVO::RVOSimulator *simulator,
-                 const std::vector<RVO::Vector2> &goals) {
+bool reachedGoal(RVO2::RVO2Simulator *simulator,
+                 const std::vector<RVO2::Vector2> &goals) {
   /* Check if all agents have reached their goals. */
   for (std::size_t i = 0U; i < simulator->getNumAgents(); ++i) {
-    if (RVO::absSq(simulator->getAgentPosition(i) - goals[i]) >
+    if (RVO2::absSq(simulator->getAgentPosition(i) - goals[i]) >
         simulator->getAgentRadius(i) * simulator->getAgentRadius(i)) {
       return false;
     }
@@ -126,19 +126,19 @@ bool reachedGoal(RVO::RVOSimulator *simulator,
 
 int main() {
   /* Store the goals of the agents. */
-  std::vector<RVO::Vector2> goals;
+  std::vector<RVO2::Vector2> goals;
 
   /* Create a new simulator instance. */
-  RVO::RVOSimulator *simulator = new RVO::RVOSimulator();
+  RVO2::RVO2Simulator *simulator = new RVO2::RVO2Simulator();
 
   /* Set up the scenario. */
   setupScenario(simulator, goals);
 
   /* Perform and manipulate the simulation. */
   do {
-#if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO2_OUTPUT_TIME_AND_POSITIONS
     updateVisualization(simulator);
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
     setPreferredVelocities(simulator, goals);
     simulator->doStep();
   } while (!reachedGoal(simulator, goals));

@@ -1,5 +1,8 @@
+# -*- mode: cmake; -*-
+# vi: set ft=cmake:
+
 #
-# RVO.pc
+# RVOConfig.cmake
 # RVO2 Library
 #
 # SPDX-FileCopyrightText: 2008 University of North Carolina at Chapel Hill
@@ -31,14 +34,18 @@
 # <https://gamma.cs.unc.edu/RVO2/>
 #
 
-prefix=@CMAKE_INSTALL_PREFIX@
-exec_prefix=${prefix}
-libdir=${exec_prefix}/@RVO_LIBRARY_DIR@
-includedir=${prefix}/@RVO_INCLUDE_DIR@
+@PACKAGE_INIT@
 
-Name: @RVO_NAME@
-Description: @PROJECT_DESCRIPTION@
-URL: @RVO_HOMEPAGE_URL@
-Version: @PROJECT_VERSION@
-Libs: -L${libdir} -l@RVO_LIBRARY@
-Cflags: -I${includedir}
+set(RVO2_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(RVO2_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(RVO2_VERSION_PATCH @PROJECT_VERSION_PATCH@)
+
+set(RVO2_VERSION @PROJECT_VERSION@)
+
+set_and_check(RVO2_INCLUDE_DIRS "@PACKAGE_RVO2_INCLUDE_DIR@")
+set_and_check(RVO2_LIBRARY_DIRS "@PACKAGE_RVO2_LIBRARY_DIR@")
+set(RVO2_LIBRARIES @PROJECT_NAME@::@RVO2_LIBRARY@)
+
+check_required_components(@PROJECT_NAME@)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")

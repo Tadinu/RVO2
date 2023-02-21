@@ -46,12 +46,12 @@ cc_test(
     timeout = "short",
     srcs = ["Blocks.cc"],
     defines = [
-        "RVO_OUTPUT_TIME_AND_POSITIONS=0",
-        "RVO_SEED_RANDOM_NUMBER_GENERATOR=0",
+        "RVO2_OUTPUT_TIME_AND_POSITIONS=0",
+        "RVO2_SEED_RANDOM_NUMBER_GENERATOR=0",
     ],
     tags = ["block-network"],
     visibility = ["//visibility:private"],
-    deps = ["//src:RVO"],
+    deps = ["//src:RVO2"],
 )
 
 cc_test(
@@ -60,12 +60,12 @@ cc_test(
     timeout = "short",
     srcs = ["Circle.cc"],
     defines = [
-        "RVO_OUTPUT_TIME_AND_POSITIONS=0",
-        "RVO_SEED_RANDOM_NUMBER_GENERATOR=0",
+        "RVO2_OUTPUT_TIME_AND_POSITIONS=0",
+        "RVO2_SEED_RANDOM_NUMBER_GENERATOR=0",
     ],
     tags = ["block-network"],
     visibility = ["//visibility:private"],
-    deps = ["//src:RVO"],
+    deps = ["//src:RVO2"],
 )
 
 cc_test(
@@ -74,10 +74,10 @@ cc_test(
     timeout = "short",
     srcs = ["Roadmap.cc"],
     defines = [
-        "RVO_OUTPUT_TIME_AND_POSITIONS=0",
-        "RVO_SEED_RANDOM_NUMBER_GENERATOR=0",
+        "RVO2_OUTPUT_TIME_AND_POSITIONS=0",
+        "RVO2_SEED_RANDOM_NUMBER_GENERATOR=0",
     ],
     tags = ["block-network"],
     visibility = ["//visibility:private"],
-    deps = ["//src:RVO"],
+    deps = ["//src:RVO2"],
 )

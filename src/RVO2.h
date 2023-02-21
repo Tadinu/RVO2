@@ -1,5 +1,5 @@
 /*
- * RVO.h
+ * RVO2.h
  * RVO2 Library
  *
  * SPDX-FileCopyrightText: 2008 University of North Carolina at Chapel Hill
@@ -31,16 +31,16 @@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_RVO_H_
-#define RVO_RVO_H_
+#ifndef RVO2_RVO2_H_
+#define RVO2_RVO2_H_
 
 /**
- * @file  RVO.h
+ * @file  RVO2.h
  * @brief Includes all public headers in the library.
  */
 
 /**
- * @namespace RVO
+ * @namespace RVO2
  * @brief     Contains all classes, functions, and constants used in the
  *            library.
  */
@@ -48,7 +48,7 @@
 /* IWYU pragma: begin_exports */
 #include "Export.h"
 #include "Line.h"
-#include "RVOSimulator.h"
+#include "RVO2Simulator.h"
 #include "Vector2.h"
 /* IWYU pragma: end_exports */
 
@@ -105,7 +105,7 @@ Please follow the following steps to install and use <b>RVO2 Library</b>.
 @li @subpage using_rvo2_library
 @li @subpage parameter_overview
 
-See the documentation of the RVO::RVOSimulator class for an exhaustive list of
+See the documentation of the RVO2::RVO2Simulator class for an exhaustive list of
 public functions of <b>RVO2 Library</b>.
 
 <b>RVO2 Library</b>, accompanying example code, and this documentation is
@@ -116,11 +116,11 @@ released under the following @subpage terms_and_conditions
 
 @section local_collision_avoidance Local Collision Avoidance
 
-The main difference between <b>RVO2 Library</b> and %RVO Library 1.x is the
+The main difference between <b>RVO2 Library</b> and %RVO2 Library 1.x is the
 local collision avoidance technique used. <b>RVO2 Library</b> uses <a
 href="http://gamma.cs.unc.edu/ORCA/">optimal reciprocal collision avoidance</a>
-(ORCA), whereas %RVO Library 1.x uses <a href="http://gamma.cs.unc.edu/RVO/">
-reciprocal velocity obstacles</a> (%RVO). For legacy reasons, and since both
+(ORCA), whereas %RVO2 Library 1.x uses <a href="http://gamma.cs.unc.edu/RVO2/">
+reciprocal velocity obstacles</a> (%RVO2). For legacy reasons, and since both
 techniques are based on the same principles of reciprocal collision avoidance
 and relative velocity, we did not change the name of the library.
 
@@ -128,11 +128,11 @@ A major consequence of the change of local collision avoidance technique is that
 the simulation has become much faster in <b>RVO2 Library</b>. optimal reciprocal
 collision avoidance defines velocity constraints with respect to other agents as
 half-planes, and an optimal velocity is efficiently found using two-dimensional
-linear programming. In contrast, %RVO Library 1.x uses random sampling to find a
-good velocity. Also, the behavior of the agents is smoother in <b>RVO2
+linear programming. In contrast, %RVO2 Library 1.x uses random sampling to find
+a good velocity. Also, the behavior of the agents is smoother in <b>RVO2
 Library</b>. It is proven mathematically that optimal reciprocal collision
 avoidance lets the velocity of agents evolve continuously over time, whereas
-%RVO Library 1.x occasionally showed oscillations and reciprocal dances.
+%RVO2 Library 1.x occasionally showed oscillations and reciprocal dances.
 Furthermore, optimal reciprocal collision avoidance provides stronger guarantees
 with respect to collision avoidance.
 
@@ -140,7 +140,7 @@ with respect to collision avoidance.
 
 Local collision avoidance as provided by <b>RVO2 Library</b> should in principle
 be accompanied by global path planning that determines the preferred velocity of
-each agent in each time step of the simulation. %RVO Library 1.x has a built-in
+each agent in each time step of the simulation. %RVO2 Library 1.x has a built-in
 roadmap infrastructure to guide agents around obstacles to fixed goals. However,
 besides roadmaps, other techniques for global planning, such as navigation
 fields, cell decompositions, etc. exist. Therefore, <b>RVO2 Library</b> does not
@@ -149,7 +149,7 @@ responsibility of the external application to set the preferred velocity of each
 agent ahead of each time step of the simulation. This makes the library more
 flexible to use in varying application domains. In one of the example
 applications that comes with <b>RVO2 Library</b>, we show how a roadmap similar
-to %RVO Library 1.x is used externally to guide the global navigation of the
+to %RVO2 Library 1.x is used externally to guide the global navigation of the
 agents. As a consequence of this change, <b>RVO2 Library</b> does not have a
 concept of a &quot;goal position&quot; or &quot;preferred speed&quot; for each
 agent, but only relies on the preferred velocities of the agents set by the
@@ -157,20 +157,20 @@ external application.
 
 @section structure_of_rvo2_library Structure of RVO2 Library
 
-The structure of <b>RVO2 Library</b> is similar to that of %RVO Library 1.x.
-Users familiar with %RVO Library 1.x should find little trouble in using <b>RVO2
-Library</b>. However, <b>RVO2 Library</b> is not backwards compatible with %RVO
-Library 1.x. The main reason for this is that the optimal reciprocal collision
-avoidance technique requires different (and fewer) parameters to be set than
-%RVO. Also, the way obstacles are represented is different. In %RVO Library 1.x,
-obstacles are represented by an arbitrary collection of line segments. In
-<b>RVO2 Library</b>, obstacles are non-intersecting polygons, specified by lists
-of vertices in counterclockwise order. Further, in %RVO Library 1.x agents
-cannot be added to the simulation after the simulation is initialized. In
-<b>RVO2 Library</b> this restriction is removed. Obstacles still need to be
-processed before the simulation starts, though. Lastly, in %RVO Library 1.x an
-instance of the simulator is a singleton. This restriction is removed in <b>RVO2
-Library</b>.
+The structure of <b>RVO2 Library</b> is similar to that of %RVO2 Library 1.x.
+Users familiar with %RVO2 Library 1.x should find little trouble in using
+<b>RVO2 Library</b>. However, <b>RVO2 Library</b> is not backwards compatible
+with %RVO2 Library 1.x. The main reason for this is that the optimal reciprocal
+collision avoidance technique requires different (and fewer) parameters to be
+set than %RVO2. Also, the way obstacles are represented is different. In %RVO2
+Library 1.x, obstacles are represented by an arbitrary collection of line
+segments. In <b>RVO2 Library</b>, obstacles are non-intersecting polygons,
+specified by lists of vertices in counterclockwise order. Further, in %RVO2
+Library 1.x agents cannot be added to the simulation after the simulation is
+initialized. In <b>RVO2 Library</b> this restriction is removed. Obstacles still
+need to be processed before the simulation starts, though. Lastly, in %RVO2
+Library 1.x an instance of the simulator is a singleton. This restriction is
+removed in <b>RVO2 Library</b>.
 
 @section smaller_changes Smaller Changes
 
@@ -184,7 +184,7 @@ finding other agents and obstacles nearby each agent.
 
 Also, <b>RVO2 Library</b> allows accessing information about the simulation,
 such as the neighbors and the collision-avoidance constraints of each agent,
-that is hidden from the user in %RVO Library 1.x.
+that is hidden from the user in %RVO2 Library 1.x.
 
 @page building_rvo2_library Building RVO2 Library
 
@@ -216,15 +216,15 @@ A program performing an <b>RVO2 Library</b> simulation has the following global
 structure.
 
 @code{.cc}
-#include <RVO.h>
+#include <RVO2.h>
 
 #include <vector>
 
-std::vector<RVO::Vector2> goals;
+std::vector<RVO2::Vector2> goals;
 
 int main() {
   // Create a new simulator instance.
-  RVO::RVOSimulator *simulator = new RVO::RVOSimulator();
+  RVO2::RVO2Simulator *simulator = new RVO2::RVO2Simulator();
 
   // Set up the scenario.
  setupScenario(simulator);
@@ -240,8 +240,8 @@ int main() {
 }
 @endcode
 
-In order to use <b>RVO2 Library</b>, the user needs to include RVO.h. The first
-step is then to create an instance of RVO::RVOSimulator. Then, the process
+In order to use <b>RVO2 Library</b>, the user needs to include RVO2.h. The first
+step is then to create an instance of RVO2::RVO2Simulator. Then, the process
 consists of two stages. The first stage is specifying the simulation scenario
 and its parameters. In the above example program, this is done in the method
 setupScenario(...), which we will discuss below. The second stage is the actual
@@ -266,7 +266,7 @@ A scenario that is to be simulated can be set up as follows. A scenario consists
 of two types of objects: agents and obstacles. Each of them can be manually
 specified. Agents may be added anytime before or during the simulation.
 Obstacles, however, need to be defined prior to the simulation, and
-RVO::RVOSimulator::processObstacles() need to be called in order for the
+RVO2::RVO2Simulator::processObstacles() need to be called in order for the
 obstacles to be accounted for in the simulation. The user may also want to
 define goal positions of the agents, or a roadmap to guide the agents around
 obstacles. This is not done in <b>RVO2 Library</b>, but needs to be taken care
@@ -276,10 +276,10 @@ The following example creates a scenario with four agents exchanging positions
 around a rectangular obstacle in the middle.
 
 @code{.cc}
-#include <RVO.h>
+#include <RVO2.h>
 
 namespace {
-void setupScenario(RVO::RVOSimulator *simulator) {
+void setupScenario(RVO2::RVO2Simulator *simulator) {
   // Specify global time step of the simulation.
   simulator->setTimeStep(0.25F);
 
@@ -287,10 +287,10 @@ void setupScenario(RVO::RVOSimulator *simulator) {
   simulator->setAgentDefaults(15.0F, 10U, 10.0F, 5.0F, 2.0F, 2.0F);
 
   // Add agents, specifying their start position.
-  simulator->addAgent(RVO::Vector2(-50.0F, -50.0F));
-  simulator->addAgent(RVO::Vector2(50.0F, -50.0F));
-  simulator->addAgent(RVO::Vector2(50.0F, 50.0F));
-  simulator->addAgent(RVO::Vector2(-50.0F, 50.0F));
+  simulator->addAgent(RVO2::Vector2(-50.0F, -50.0F));
+  simulator->addAgent(RVO2::Vector2(50.0F, -50.0F));
+  simulator->addAgent(RVO2::Vector2(50.0F, 50.0F));
+  simulator->addAgent(RVO2::Vector2(-50.0F, 50.0F));
 
   // Create goals. The simulator is unaware of these.
   for (std::size_t i = 0U; i < simulator->getNumAgents(); ++i) {
@@ -298,11 +298,11 @@ void setupScenario(RVO::RVOSimulator *simulator) {
   }
 
   // Add polygonal obstacle(s), specifying vertices in counterclockwise order.
-  std::vector<RVO::Vector2> vertices;
-  vertices.push_back(RVO::Vector2(-7.0F, -20.0F));
-  vertices.push_back(RVO::Vector2(7.0F, -20.0F));
-  vertices.push_back(RVO::Vector2(7.0F, 20.0F));
-  vertices.push_back(RVO::Vector2(-7.0F, 20.0F));
+  std::vector<RVO2::Vector2> vertices;
+  vertices.push_back(RVO2::Vector2(-7.0F, -20.0F));
+  vertices.push_back(RVO2::Vector2(7.0F, -20.0F));
+  vertices.push_back(RVO2::Vector2(7.0F, 20.0F));
+  vertices.push_back(RVO2::Vector2(-7.0F, 20.0F));
 
   simulator->addObstacle(vertices);
 
@@ -312,7 +312,7 @@ void setupScenario(RVO::RVOSimulator *simulator) {
 }  // namespace
 @endcode
 
-See the documentation on RVO::RVOSimulator for a full overview of the
+See the documentation on RVO2::RVO2Simulator for a full overview of the
 functionality to specify scenarios.
 
 @section retrieving_information_from_the_simulation Retrieving Information from
@@ -327,13 +327,13 @@ termination condition is checked in the reachedGoal(...) method. Here we give an
 example that returns true if all agents are within one radius of their goals.
 
 @code{.cc}
-#include <RVO.h>
+#include <RVO2.h>
 
 #include <cstddef>
 #include <iostream>
 
 namespace {
-void updateVisualization(RVO::RVOSimulator *simulator) {
+void updateVisualization(RVO2::RVO2Simulator *simulator) {
   // Output the current global time.
   std::cout << simulator->getGlobalTime() << " ";
 
@@ -348,11 +348,11 @@ void updateVisualization(RVO::RVOSimulator *simulator) {
 @endcode
 
 @code{.cc}
-#include <RVO.h>
+#include <RVO2.h>
 
 #include <cstddef>
 
-bool reachedGoal(RVO::RVOSimulator *simulator) {
+bool reachedGoal(RVO2::RVO2Simulator *simulator) {
   // Check whether all agents have arrived at their goals.
   for (std::size_t i = 0U; i < simulator->getNumAgents(); ++i) {
     if (absSq(goals[i] - simulator->getAgentPosition(i)) >
@@ -369,7 +369,7 @@ bool reachedGoal(RVO::RVOSimulator *simulator) {
 Using similar functions as the ones used in this example, the user can access
 information about other parameters of the agents, as well as the global
 parameters, and the obstacles. See the documentation of the class
-RVO::RVOSimulator for an exhaustive list of public functions for retrieving
+RVO2::RVO2Simulator for an exhaustive list of public functions for retrieving
 simulation information.
 
 @section manipulating_the_simulation Manipulating the Simulation
@@ -380,10 +380,10 @@ changing the global parameters, or changing the parameters of the agents
 agents a new position, which make them jump through the scene. New agents can be
 added to the simulation at any time, but it is not allowed to add obstacles to
 the simulation after they have been processed by calling
-RVO::RVOSimulator::processObstacles(). Also, it is impossible to change the
+RVO2::RVO2Simulator::processObstacles(). Also, it is impossible to change the
 position of the vertices of the obstacles.
 
-See the documentation of the class RVO::RVOSimulator for an exhaustive list of
+See the documentation of the class RVO2::RVO2Simulator for an exhaustive list of
 public functions for manipulating the simulation.
 
 To provide global guidance to the agents, the preferred velocities of the agents
@@ -396,18 +396,18 @@ this a roadmap or other global planning techniques may be used (see one of the
 @ref example_programs "example programs" that accompanies <b>RVO2 Library</b>).
 
 @code{.cc}
-#include <RVO.h>
+#include <RVO2.h>
 
 #include <cstddef>
 
 namespace {
-void setPreferredVelocities(RVO::RVOSimulator *simulator) {
+void setPreferredVelocities(RVO2::RVO2Simulator *simulator) {
   // Set the preferred velocity for each agent.
   for (std::size_t i = 0U; i < simulator->getNumAgents(); ++i) {
     if (absSq(goals[i] - simulator->getAgentPosition(i)) <
         simulator->getAgentRadius(i) * simulator->getAgentRadius(i) ) {
       // Agent is within one radius of its goal, set preferred velocity to zero.
-      simulator->setAgentPrefVelocity(i, RVO::Vector2(0.0F, 0.0F));
+      simulator->setAgentPrefVelocity(i, RVO2::Vector2(0.0F, 0.0F));
     } else {
       // Agent is far away from its goal, set preferred velocity as unit vector
       // towards agent's goal.
@@ -423,7 +423,7 @@ simulator->getAgentPosition(i)));
 @section example_programs Example Programs
 
 <b>RVO2 Library</b> is accompanied by three example programs, which can be found
-in the <tt>$RVO_ROOT/examples</tt> directory. The examples are named Blocks,
+in the <tt>$RVO2_ROOT/examples</tt> directory. The examples are named Blocks,
 Circle, and Roadmap, and contain the following demonstration scenarios:
 
 <table border="0" cellpadding="3" width="100%">
@@ -495,12 +495,12 @@ simulation will not be safe. Must be non-negative.</td>
 </tr>
 <tr>
 <td valign="top" width="150">position</td>
-<td valign="top" width="150">RVO::Vector2 (distance, distance)</td>
+<td valign="top" width="150">RVO2::Vector2 (distance, distance)</td>
 <td valign="top">The current position of the agent.</td>
 </tr>
 <tr>
 <td valign="top" width="150">prefVelocity</td>
-<td valign="top" width="150">RVO::Vector2 (distance/time, distance/time)</td>
+<td valign="top" width="150">RVO2::Vector2 (distance/time, distance/time)</td>
 <td valign="top">The current preferred velocity of the agent. This is the
 velocity the agent would take if no other agents or obstacles were around. The
 simulator computes an actual velocity for the agent that follows the preferred
@@ -532,7 +532,7 @@ be positive.</td>
 </tr>
 <tr>
 <td valign="top" width="150">velocity</td>
-<td valign="top" width="150">RVO::Vector2 (distance/time, distance/time)</td>
+<td valign="top" width="150">RVO2::Vector2 (distance/time, distance/time)</td>
 <td valign="top">The (current) velocity of the agent.</td>
 </tr>
 </table>
@@ -633,4 +633,4 @@ other countries. Other names may be trademarks of their respective owners.
 
  */
 
-#endif /* RVO_RVO_H_ */
+#endif /* RVO2_RVO2_H_ */

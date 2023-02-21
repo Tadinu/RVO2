@@ -45,41 +45,41 @@
  * @sa    Roadmap.cc
  */
 
-#ifndef RVO_OUTPUT_TIME_AND_POSITIONS
-#define RVO_OUTPUT_TIME_AND_POSITIONS 1
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#ifndef RVO2_OUTPUT_TIME_AND_POSITIONS
+#define RVO2_OUTPUT_TIME_AND_POSITIONS 1
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
 
-#ifndef RVO_SEED_RANDOM_NUMBER_GENERATOR
-#define RVO_SEED_RANDOM_NUMBER_GENERATOR 1
-#endif /* RVO_SEED_RANDOM_NUMBER_GENERATOR */
+#ifndef RVO2_SEED_RANDOM_NUMBER_GENERATOR
+#define RVO2_SEED_RANDOM_NUMBER_GENERATOR 1
+#endif /* RVO2_SEED_RANDOM_NUMBER_GENERATOR */
 
 #include <cmath>
 #include <cstdlib>
 #include <vector>
 
-#if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO2_OUTPUT_TIME_AND_POSITIONS
 #include <iostream>
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
 
-#if RVO_SEED_RANDOM_NUMBER_GENERATOR
+#if RVO2_SEED_RANDOM_NUMBER_GENERATOR
 #include <ctime>
-#endif /* RVO_SEED_RANDOM_NUMBER_GENERATOR */
+#endif /* RVO2_SEED_RANDOM_NUMBER_GENERATOR */
 
 #if _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
 
-#include "RVO.h"
+#include "RVO2.h"
 
 namespace {
-const float RVO_TWO_PI = 6.28318530717958647692F;
+const float RVO2_TWO_PI = 6.28318530717958647692F;
 
 void setupScenario(
-    RVO::RVOSimulator *simulator,
-    std::vector<RVO::Vector2> &goals) { /* NOLINT(runtime/references) */
-#if RVO_SEED_RANDOM_NUMBER_GENERATOR
+    RVO2::RVO2Simulator *simulator,
+    std::vector<RVO2::Vector2> &goals) { /* NOLINT(runtime/references) */
+#if RVO2_SEED_RANDOM_NUMBER_GENERATOR
   std::srand(static_cast<unsigned int>(std::time(NULL)));
-#endif /* RVO_SEED_RANDOM_NUMBER_GENERATOR */
+#endif /* RVO2_SEED_RANDOM_NUMBER_GENERATOR */
 
   /* Specify the global time step of the simulation. */
   simulator->setTimeStep(0.25F);
@@ -91,50 +91,52 @@ void setupScenario(
    * opposite side of the environment. */
   for (std::size_t i = 0U; i < 5U; ++i) {
     for (std::size_t j = 0U; j < 5U; ++j) {
-      simulator->addAgent(RVO::Vector2(55.0F + static_cast<float>(i) * 10.0F,
-                                       55.0F + static_cast<float>(j) * 10.0F));
-      goals.push_back(RVO::Vector2(-75.0F, -75.0F));
+      simulator->addAgent(RVO2::Vector2(55.0F + static_cast<float>(i) * 10.0F,
+                                        55.0F + static_cast<float>(j) * 10.0F));
+      goals.push_back(RVO2::Vector2(-75.0F, -75.0F));
 
-      simulator->addAgent(RVO::Vector2(-55.0F - static_cast<float>(i) * 10.0F,
-                                       55.0F + static_cast<float>(j) * 10.0F));
-      goals.push_back(RVO::Vector2(75.0F, -75.0F));
+      simulator->addAgent(RVO2::Vector2(-55.0F - static_cast<float>(i) * 10.0F,
+                                        55.0F + static_cast<float>(j) * 10.0F));
+      goals.push_back(RVO2::Vector2(75.0F, -75.0F));
 
-      simulator->addAgent(RVO::Vector2(55.0F + static_cast<float>(i) * 10.0F,
-                                       -55.0F - static_cast<float>(j) * 10.0F));
-      goals.push_back(RVO::Vector2(-75.0F, 75.0F));
+      simulator->addAgent(
+          RVO2::Vector2(55.0F + static_cast<float>(i) * 10.0F,
+                        -55.0F - static_cast<float>(j) * 10.0F));
+      goals.push_back(RVO2::Vector2(-75.0F, 75.0F));
 
-      simulator->addAgent(RVO::Vector2(-55.0F - static_cast<float>(i) * 10.0F,
-                                       -55.0F - static_cast<float>(j) * 10.0F));
-      goals.push_back(RVO::Vector2(75.0F, 75.0F));
+      simulator->addAgent(
+          RVO2::Vector2(-55.0F - static_cast<float>(i) * 10.0F,
+                        -55.0F - static_cast<float>(j) * 10.0F));
+      goals.push_back(RVO2::Vector2(75.0F, 75.0F));
     }
   }
 
   /* Add polygonal obstacles, specifying their vertices in counterclockwise
    * order. */
-  std::vector<RVO::Vector2> obstacle1;
-  std::vector<RVO::Vector2> obstacle2;
-  std::vector<RVO::Vector2> obstacle3;
-  std::vector<RVO::Vector2> obstacle4;
+  std::vector<RVO2::Vector2> obstacle1;
+  std::vector<RVO2::Vector2> obstacle2;
+  std::vector<RVO2::Vector2> obstacle3;
+  std::vector<RVO2::Vector2> obstacle4;
 
-  obstacle1.push_back(RVO::Vector2(-10.0F, 40.0F));
-  obstacle1.push_back(RVO::Vector2(-40.0F, 40.0F));
-  obstacle1.push_back(RVO::Vector2(-40.0F, 10.0F));
-  obstacle1.push_back(RVO::Vector2(-10.0F, 10.0F));
+  obstacle1.push_back(RVO2::Vector2(-10.0F, 40.0F));
+  obstacle1.push_back(RVO2::Vector2(-40.0F, 40.0F));
+  obstacle1.push_back(RVO2::Vector2(-40.0F, 10.0F));
+  obstacle1.push_back(RVO2::Vector2(-10.0F, 10.0F));
 
-  obstacle2.push_back(RVO::Vector2(10.0F, 40.0F));
-  obstacle2.push_back(RVO::Vector2(10.0F, 10.0F));
-  obstacle2.push_back(RVO::Vector2(40.0F, 10.0F));
-  obstacle2.push_back(RVO::Vector2(40.0F, 40.0F));
+  obstacle2.push_back(RVO2::Vector2(10.0F, 40.0F));
+  obstacle2.push_back(RVO2::Vector2(10.0F, 10.0F));
+  obstacle2.push_back(RVO2::Vector2(40.0F, 10.0F));
+  obstacle2.push_back(RVO2::Vector2(40.0F, 40.0F));
 
-  obstacle3.push_back(RVO::Vector2(10.0F, -40.0F));
-  obstacle3.push_back(RVO::Vector2(40.0F, -40.0F));
-  obstacle3.push_back(RVO::Vector2(40.0F, -10.0F));
-  obstacle3.push_back(RVO::Vector2(10.0F, -10.0F));
+  obstacle3.push_back(RVO2::Vector2(10.0F, -40.0F));
+  obstacle3.push_back(RVO2::Vector2(40.0F, -40.0F));
+  obstacle3.push_back(RVO2::Vector2(40.0F, -10.0F));
+  obstacle3.push_back(RVO2::Vector2(10.0F, -10.0F));
 
-  obstacle4.push_back(RVO::Vector2(-10.0F, -40.0F));
-  obstacle4.push_back(RVO::Vector2(-10.0F, -10.0F));
-  obstacle4.push_back(RVO::Vector2(-40.0F, -10.0F));
-  obstacle4.push_back(RVO::Vector2(-40.0F, -40.0F));
+  obstacle4.push_back(RVO2::Vector2(-10.0F, -40.0F));
+  obstacle4.push_back(RVO2::Vector2(-10.0F, -10.0F));
+  obstacle4.push_back(RVO2::Vector2(-40.0F, -10.0F));
+  obstacle4.push_back(RVO2::Vector2(-40.0F, -40.0F));
 
   simulator->addObstacle(obstacle1);
   simulator->addObstacle(obstacle2);
@@ -145,8 +147,8 @@ void setupScenario(
   simulator->processObstacles();
 }
 
-#if RVO_OUTPUT_TIME_AND_POSITIONS
-void updateVisualization(RVO::RVOSimulator *simulator) {
+#if RVO2_OUTPUT_TIME_AND_POSITIONS
+void updateVisualization(RVO2::RVO2Simulator *simulator) {
   /* Output the current global time. */
   std::cout << simulator->getGlobalTime();
 
@@ -157,41 +159,41 @@ void updateVisualization(RVO::RVOSimulator *simulator) {
 
   std::cout << std::endl;
 }
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
 
-void setPreferredVelocities(RVO::RVOSimulator *simulator,
-                            const std::vector<RVO::Vector2> &goals) {
+void setPreferredVelocities(RVO2::RVO2Simulator *simulator,
+                            const std::vector<RVO2::Vector2> &goals) {
   /* Set the preferred velocity to be a vector of unit magnitude (speed) in the
    * direction of the goal. */
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif /* _OPENMP */
   for (int i = 0; i < static_cast<int>(simulator->getNumAgents()); ++i) {
-    RVO::Vector2 goalVector = goals[i] - simulator->getAgentPosition(i);
+    RVO2::Vector2 goalVector = goals[i] - simulator->getAgentPosition(i);
 
-    if (RVO::absSq(goalVector) > 1.0F) {
-      goalVector = RVO::normalize(goalVector);
+    if (RVO2::absSq(goalVector) > 1.0F) {
+      goalVector = RVO2::normalize(goalVector);
     }
 
     simulator->setAgentPrefVelocity(i, goalVector);
 
     /* Perturb a little to avoid deadlocks due to perfect symmetry. */
-    float angle = static_cast<float>(std::rand()) * RVO_TWO_PI /
+    float angle = static_cast<float>(std::rand()) * RVO2_TWO_PI /
                   static_cast<float>(RAND_MAX);
     float dist = static_cast<float>(std::rand()) * 0.0001F /
                  static_cast<float>(RAND_MAX);
 
     simulator->setAgentPrefVelocity(
         i, simulator->getAgentPrefVelocity(i) +
-               dist * RVO::Vector2(std::cos(angle), std::sin(angle)));
+               dist * RVO2::Vector2(std::cos(angle), std::sin(angle)));
   }
 }
 
-bool reachedGoal(RVO::RVOSimulator *simulator,
-                 const std::vector<RVO::Vector2> &goals) {
+bool reachedGoal(RVO2::RVO2Simulator *simulator,
+                 const std::vector<RVO2::Vector2> &goals) {
   /* Check if all agents have reached their goals. */
   for (std::size_t i = 0U; i < simulator->getNumAgents(); ++i) {
-    if (RVO::absSq(simulator->getAgentPosition(i) - goals[i]) > 400.0F) {
+    if (RVO2::absSq(simulator->getAgentPosition(i) - goals[i]) > 400.0F) {
       return false;
     }
   }
@@ -202,19 +204,19 @@ bool reachedGoal(RVO::RVOSimulator *simulator,
 
 int main() {
   /* Store the goals of the agents. */
-  std::vector<RVO::Vector2> goals;
+  std::vector<RVO2::Vector2> goals;
 
   /* Create a new simulator instance. */
-  RVO::RVOSimulator *simulator = new RVO::RVOSimulator();
+  RVO2::RVO2Simulator *simulator = new RVO2::RVO2Simulator();
 
   /* Set up the scenario. */
   setupScenario(simulator, goals);
 
   /* Perform and manipulate the simulation. */
   do {
-#if RVO_OUTPUT_TIME_AND_POSITIONS
+#if RVO2_OUTPUT_TIME_AND_POSITIONS
     updateVisualization(simulator);
-#endif /* RVO_OUTPUT_TIME_AND_POSITIONS */
+#endif /* RVO2_OUTPUT_TIME_AND_POSITIONS */
     setPreferredVelocities(simulator, goals);
     simulator->doStep();
   } while (!reachedGoal(simulator, goals));

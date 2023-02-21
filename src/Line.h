@@ -31,8 +31,8 @@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_LINE_H_
-#define RVO_LINE_H_
+#ifndef RVO2_LINE_H_
+#define RVO2_LINE_H_
 
 /**
  * @file  Line.h
@@ -41,7 +41,7 @@
 
 #include "Vector2.h"
 
-namespace RVO {
+namespace RVO2 {
 /**
  * @brief Defines a directed line.
  */
@@ -62,6 +62,6 @@ class Line {
    */
   Vector2 point;
 };
-} /* namespace RVO */
+} /* namespace RVO2 */
 
-#endif /* RVO_LINE_H_ */
+#endif /* RVO2_LINE_H_ */

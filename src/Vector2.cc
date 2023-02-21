@@ -41,8 +41,8 @@
 #include <cmath>
 #include <ostream>
 
-namespace RVO {
-const float RVO_EPSILON = 0.00001F;
+namespace RVO2 {
+const float RVO2_EPSILON = 0.00001F;
 
 Vector2::Vector2() : x_(0.0F), y_(0.0F) {}
 
@@ -133,4 +133,4 @@ float leftOf(const Vector2 &vector1, const Vector2 &vector2,
 }
 
 Vector2 normalize(const Vector2 &vector) { return vector / abs(vector); }
-} /* namespace RVO */
+} /* namespace RVO2 */

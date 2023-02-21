@@ -1,5 +1,5 @@
 /*
- * RVOSimulator.h
+ * RVO2Simulator.h
  * RVO2 Library
  *
  * SPDX-FileCopyrightText: 2008 University of North Carolina at Chapel Hill
@@ -31,17 +31,17 @@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_RVO_SIMULATOR_H_
-#define RVO_RVO_SIMULATOR_H_
+#ifndef RVO2_RVO2_SIMULATOR_H_
+#define RVO2_RVO2_SIMULATOR_H_
 
 /**
- * @file  RVOSimulator.h
- * @brief Declares and defines the RVOSimulator class.
+ * @file  RVO2Simulator.h
+ * @brief Declares and defines the RVO2Simulator class.
  */
 
 #include <vector>
 
-namespace RVO {
+namespace RVO2 {
 class Agent;
 class KdTree;
 class Line;
@@ -49,22 +49,22 @@ class Obstacle;
 class Vector2;
 
 /**
- * @relates RVOSimulator
+ * @relates RVO2Simulator
  * @brief   Error value. A value equal to the largest unsigned integer that is
- *          returned in case of an error by functions in RVO::RVOSimulator.
+ *          returned in case of an error by functions in RVO2::RVO2Simulator.
  */
-extern const std::size_t RVO_ERROR;
+extern const std::size_t RVO2_ERROR;
 
 /**
  * @brief Defines the simulation. The main class of the library that contains
  *        all simulation functionality.
  */
-class RVOSimulator {
+class RVO2Simulator {
  public:
   /**
    * @brief Constructs a simulator instance.
    */
-  RVOSimulator();
+  RVO2Simulator();
 
   /**
    * @brief     Constructs a simulator instance and sets the default
@@ -102,9 +102,9 @@ class RVOSimulator {
    * @param[in] maxSpeed        The default maximum speed of a new agent. Must
    *                            be non-negative.
    */
-  RVOSimulator(float timeStep, float neighborDist, std::size_t maxNeighbors,
-               float timeHorizon, float timeHorizonObst, float radius,
-               float maxSpeed);
+  RVO2Simulator(float timeStep, float neighborDist, std::size_t maxNeighbors,
+                float timeHorizon, float timeHorizonObst, float radius,
+                float maxSpeed);
 
   /**
    * @brief     Constructs a simulator instance and sets the default properties
@@ -144,19 +144,19 @@ class RVOSimulator {
    * @param[in] velocity        The default initial two-dimensional linear
    *                            velocity of a new agent.
    */
-  RVOSimulator(float timeStep, float neighborDist, std::size_t maxNeighbors,
-               float timeHorizon, float timeHorizonObst, float radius,
-               float maxSpeed, const Vector2 &velocity);
+  RVO2Simulator(float timeStep, float neighborDist, std::size_t maxNeighbors,
+                float timeHorizon, float timeHorizonObst, float radius,
+                float maxSpeed, const Vector2 &velocity);
 
   /**
    * @brief Destroys this simulator instance.
    */
-  ~RVOSimulator();
+  ~RVO2Simulator();
 
   /**
    * @brief     Adds a new agent with default properties to the simulation.
    * @param[in] position The two-dimensional starting position of this agent.
-   * @return    The number of the agent, or RVO::RVO_ERROR when the agent
+   * @return    The number of the agent, or RVO2::RVO2_ERROR when the agent
    *            defaults have not been set.
    */
   std::size_t addAgent(const Vector2 &position);
@@ -247,7 +247,7 @@ class RVOSimulator {
    * @param[in] vertices List of the vertices of the polygonal obstacle in
    *                     counterclockwise order.
    * @return    The number of the first vertex of the obstacle, or
-   *            RVO::RVO_ERROR when the number of vertices is less than two.
+   *            RVO2::RVO2_ERROR when the number of vertices is less than two.
    * @note      To add a "negative" obstacle, e.g., a bounding polygon around
    *            the environment, the vertices should be listed in clockwise
    *            order.
@@ -644,10 +644,10 @@ class RVOSimulator {
 
  private:
   /* Not implemented. */
-  RVOSimulator(const RVOSimulator &other);
+  RVO2Simulator(const RVO2Simulator &other);
 
   /* Not implemented. */
-  RVOSimulator &operator=(const RVOSimulator &other);
+  RVO2Simulator &operator=(const RVO2Simulator &other);
 
   std::vector<Agent *> agents_;
   std::vector<Obstacle *> obstacles_;
@@ -658,6 +658,6 @@ class RVOSimulator {
 
   friend class KdTree;
 };
-} /* namespace RVO */
+} /* namespace RVO2 */
 
-#endif /* RVO_RVO_SIMULATOR_H_ */
+#endif /* RVO2_RVO2_SIMULATOR_H_ */

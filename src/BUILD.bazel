@@ -80,24 +80,24 @@ cat << 'EOF' > $@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_EXPORT_H_
-#define RVO_EXPORT_H_
+#ifndef RVO2_EXPORT_H_
+#define RVO2_EXPORT_H_
 
-#ifdef RVO_STATIC_DEFINE
-#define RVO_EXPORT
+#ifdef RVO2_STATIC_DEFINE
+#define RVO2_EXPORT
 #else
 #ifdef _WIN32
-#ifdef RVO_EXPORTS
-#define RVO_EXPORT __declspec(dllexport)
+#ifdef RVO2_EXPORTS
+#define RVO2_EXPORT __declspec(dllexport)
 #else
-#define RVO_EXPORT __declspec(dllimport)
+#define RVO2_EXPORT __declspec(dllimport)
 #endif
 #else
-#define RVO_EXPORT __attribute__((visibility("default")))
+#define RVO2_EXPORT __attribute__((visibility("default")))
 #endif
 #endif
 
-#endif /* RVO_EXPORT_H_ */
+#endif /* RVO2_EXPORT_H_ */
 EOF
 """,
     visibility = ["//visibility:private"],
@@ -109,15 +109,15 @@ filegroup(
     srcs = [
         "Export.h",
         "Line.h",
-        "RVO.h",
-        "RVOSimulator.h",
+        "RVO2.h",
+        "RVO2Simulator.h",
         "Vector2.h",
     ],
     visibility = ["//visibility:private"],
 )
 
 cc_library(
-    name = "RVO",
+    name = "RVO2",
     srcs = [
         "Agent.cc",
         "Agent.h",
@@ -127,7 +127,7 @@ cc_library(
         "Line.cc",
         "Obstacle.cc",
         "Obstacle.h",
-        "RVOSimulator.cc",
+        "RVO2Simulator.cc",
         "Vector2.cc",
     ],
     hdrs = [":hdrs"],
@@ -143,6 +143,6 @@ pkg_files(
     name = "include",
     srcs = [":hdrs"],
     attributes = pkg_attributes(mode = "0644"),
-    prefix = "usr/include/RVO",
+    prefix = "usr/include/RVO2",
     visibility = ["//:__pkg__"],
 )

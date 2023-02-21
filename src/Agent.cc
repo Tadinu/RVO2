@@ -45,7 +45,7 @@
 #include "KdTree.h"
 #include "Obstacle.h"
 
-namespace RVO {
+namespace RVO2 {
 namespace {
 /**
  * @relates        Agent
@@ -81,7 +81,7 @@ bool linearProgram1(const std::vector<Line> &lines, std::size_t lineNo,
     const float numerator =
         det(lines[i].direction, lines[lineNo].point - lines[i].point);
 
-    if (std::fabs(denominator) <= RVO_EPSILON) {
+    if (std::fabs(denominator) <= RVO2_EPSILON) {
       /* Lines lineNo and i are (almost) parallel. */
       if (numerator < 0.0F) {
         return false;
@@ -203,7 +203,7 @@ void linearProgram3(const std::vector<Line> &lines, std::size_t numObstLines,
 
         const float determinant = det(lines[i].direction, lines[j].direction);
 
-        if (std::fabs(determinant) <= RVO_EPSILON) {
+        if (std::fabs(determinant) <= RVO2_EPSILON) {
           /* Line i and line j are parallel. */
           if (lines[i].direction * lines[j].direction > 0.0F) {
             /* Line i and line j point in the same direction. */
@@ -288,11 +288,11 @@ void Agent::computeNewVelocity(float timeStep) {
       if (det(invTimeHorizonObst * relativePosition1 - orcaLines_[j].point,
               orcaLines_[j].direction) -
                   invTimeHorizonObst * radius_ >=
-              -RVO_EPSILON &&
+              -RVO2_EPSILON &&
           det(invTimeHorizonObst * relativePosition2 - orcaLines_[j].point,
               orcaLines_[j].direction) -
                   invTimeHorizonObst * radius_ >=
-              -RVO_EPSILON) {
+              -RVO2_EPSILON) {
         alreadyCovered = true;
         break;
       }
@@ -676,4 +676,4 @@ void Agent::update(float timeStep) {
   velocity_ = newVelocity_;
   position_ += velocity_ * timeStep;
 }
-} /* namespace RVO */
+} /* namespace RVO2 */

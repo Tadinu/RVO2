@@ -38,6 +38,6 @@
 
 #include "Line.h"
 
-namespace RVO {
+namespace RVO2 {
 Line::Line() {}
-} /* namespace RVO */
+} /* namespace RVO2 */

@@ -31,8 +31,8 @@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_AGENT_H_
-#define RVO_AGENT_H_
+#ifndef RVO2_AGENT_H_
+#define RVO2_AGENT_H_
 
 /**
  * @file  Agent.h
@@ -44,7 +44,7 @@
 #include "Line.h"
 #include "Vector2.h"
 
-namespace RVO {
+namespace RVO2 {
 class KdTree;
 class Obstacle;
 
@@ -122,8 +122,8 @@ class Agent {
   float timeHorizonObst_;
 
   friend class KdTree;
-  friend class RVOSimulator;
+  friend class RVO2Simulator;
 };
-} /* namespace RVO */
+} /* namespace RVO2 */
 
-#endif /* RVO_AGENT_H_ */
+#endif /* RVO2_AGENT_H_ */

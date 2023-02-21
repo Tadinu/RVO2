@@ -43,16 +43,16 @@
 
 #include "Agent.h"
 #include "Obstacle.h"
-#include "RVOSimulator.h"
+#include "RVO2Simulator.h"
 #include "Vector2.h"
 
-namespace RVO {
+namespace RVO2 {
 namespace {
 /**
  * @relates KdTree
  * @brief   The maximum k-D tree node leaf size.
  */
-const std::size_t RVO_MAX_LEAF_SIZE = 10U;
+const std::size_t RVO2_MAX_LEAF_SIZE = 10U;
 } /* namespace */
 
 /**
@@ -159,7 +159,7 @@ KdTree::ObstacleTreeNode::ObstacleTreeNode()
 
 KdTree::ObstacleTreeNode::~ObstacleTreeNode() {}
 
-KdTree::KdTree(RVOSimulator *simulator)
+KdTree::KdTree(RVO2Simulator *simulator)
     : obstacleTree_(NULL), simulator_(simulator) {}
 
 KdTree::~KdTree() { deleteObstacleTree(obstacleTree_); }
@@ -196,7 +196,7 @@ void KdTree::buildAgentTreeRecursive(std::size_t begin, std::size_t end,
         std::min(agentTree_[node].minY, agents_[i]->position_.y());
   }
 
-  if (end - begin > RVO_MAX_LEAF_SIZE) {
+  if (end - begin > RVO2_MAX_LEAF_SIZE) {
     /* No leaf node. */
     const bool isVertical = agentTree_[node].maxX - agentTree_[node].minX >
                             agentTree_[node].maxY - agentTree_[node].minY;
@@ -274,9 +274,9 @@ KdTree::ObstacleTreeNode *KdTree::buildObstacleTreeRecursive(
           const float j2LeftOfI = leftOf(obstacleI1->point_, obstacleI2->point_,
                                          obstacleJ2->point_);
 
-          if (j1LeftOfI >= -RVO_EPSILON && j2LeftOfI >= -RVO_EPSILON) {
+          if (j1LeftOfI >= -RVO2_EPSILON && j2LeftOfI >= -RVO2_EPSILON) {
             ++leftSize;
-          } else if (j1LeftOfI <= RVO_EPSILON && j2LeftOfI <= RVO_EPSILON) {
+          } else if (j1LeftOfI <= RVO2_EPSILON && j2LeftOfI <= RVO2_EPSILON) {
             ++rightSize;
           } else {
             ++leftSize;
@@ -323,9 +323,9 @@ KdTree::ObstacleTreeNode *KdTree::buildObstacleTreeRecursive(
         const float j2LeftOfI =
             leftOf(obstacleI1->point_, obstacleI2->point_, obstacleJ2->point_);
 
-        if (j1LeftOfI >= -RVO_EPSILON && j2LeftOfI >= -RVO_EPSILON) {
+        if (j1LeftOfI >= -RVO2_EPSILON && j2LeftOfI >= -RVO2_EPSILON) {
           leftObstacles[leftCounter++] = obstacles[j];
-        } else if (j1LeftOfI <= RVO_EPSILON && j2LeftOfI <= RVO_EPSILON) {
+        } else if (j1LeftOfI <= RVO2_EPSILON && j2LeftOfI <= RVO2_EPSILON) {
           rightObstacles[rightCounter++] = obstacles[j];
         } else {
           /* Split obstacle j. */
@@ -389,7 +389,7 @@ void KdTree::deleteObstacleTree(ObstacleTreeNode *node) {
 
 void KdTree::queryAgentTreeRecursive(Agent *agent, float &rangeSq,
                                      std::size_t node) const {
-  if (agentTree_[node].end - agentTree_[node].begin <= RVO_MAX_LEAF_SIZE) {
+  if (agentTree_[node].end - agentTree_[node].begin <= RVO2_MAX_LEAF_SIZE) {
     for (std::size_t i = agentTree_[node].begin; i < agentTree_[node].end;
          ++i) {
       agent->insertAgentNeighbor(agents_[i], rangeSq);
@@ -520,4 +520,4 @@ bool KdTree::queryVisibilityRecursive(const Vector2 &vector1,
 
   return true;
 }
-} /* namespace RVO */
+} /* namespace RVO2 */

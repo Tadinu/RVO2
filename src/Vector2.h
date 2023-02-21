@@ -31,8 +31,8 @@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_VECTOR2_H_
-#define RVO_VECTOR2_H_
+#ifndef RVO2_VECTOR2_H_
+#define RVO2_VECTOR2_H_
 
 /**
  * @file  Vector2.h
@@ -42,11 +42,11 @@
 
 // #include "Export.h"
 
-namespace RVO {
+namespace RVO2 {
 /**
  * @brief A sufficiently small positive number.
  */
-extern const float RVO_EPSILON;
+extern const float RVO2_EPSILON;
 
 /**
  * @brief Defines a two-dimensional vector.
@@ -268,6 +268,6 @@ float leftOf(const Vector2 &vector1, const Vector2 &vector2,
  * @return    The normalization of the two-dimensional vector.
  */
 Vector2 normalize(const Vector2 &vector);
-} /* namespace RVO */
+} /* namespace RVO2 */
 
-#endif /* RVO_VECTOR2_H_ */
+#endif /* RVO2_VECTOR2_H_ */

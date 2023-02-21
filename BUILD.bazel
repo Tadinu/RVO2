@@ -60,7 +60,7 @@ pkg_files(
     name = "doc",
     srcs = ["LICENSE"],
     attributes = pkg_attributes(mode = "0644"),
-    prefix = "usr/share/doc/RVO",
+    prefix = "usr/share/doc/RVO2",
     visibility = ["//visibility:private"],
 )
 
@@ -68,7 +68,7 @@ cc_binary(
     name = "libRVO.so",
     linkshared = True,
     visibility = ["//visibility:private"],
-    deps = ["//src:RVO"],
+    deps = ["//src:RVO2"],
 )
 
 pkg_files(
@@ -82,11 +82,11 @@ pkg_files(
 # REUSE-IgnoreStart
 genrule(
     name = "pc",
-    outs = ["RVO.pc"],
+    outs = ["RVO2.pc"],
     cmd = """
 cat << 'EOF' > $@
 #
-# RVO.pc
+# RVO2.pc
 # RVO2 Library
 #
 # SPDX-FileCopyrightText: 2008 University of North Carolina at Chapel Hill
@@ -121,7 +121,7 @@ cat << 'EOF' > $@
 prefix=/usr
 exec_prefix=$${prefix}
 libdir=$${exec_prefix}/lib
-includedir=$${prefix}/include/RVO
+includedir=$${prefix}/include/RVO2
 
 Name: RVO2 Library
 Description: Optimal Reciprocal Collision Avoidance
@@ -137,14 +137,14 @@ EOF
 
 pkg_files(
     name = "pkgconfig",
-    srcs = ["RVO.pc"],
+    srcs = ["RVO2.pc"],
     attributes = pkg_attributes(mode = "0644"),
     prefix = "usr/lib/pkgconfig",
     visibility = ["//visibility:private"],
 )
 
 pkg_tar(
-    name = "RVO",
+    name = "RVO2",
     srcs = [
         ":doc",
         ":lib",
@@ -158,7 +158,7 @@ pkg_tar(
 pkg_deb(
     name = "deb",
     architecture = "amd64",
-    data = ":RVO",
+    data = ":RVO2",
     depends = [
         "libc6",
         "libgcc-s1",

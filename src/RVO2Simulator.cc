@@ -1,5 +1,5 @@
 /*
- * RVOSimulator.cc
+ * RVO2Simulator.cc
  * RVO2 Library
  *
  * SPDX-FileCopyrightText: 2008 University of North Carolina at Chapel Hill
@@ -32,11 +32,11 @@
  */
 
 /**
- * @file  RVOSimulator.cc
- * @brief Defines the RVOSimulator class.
+ * @file  RVO2Simulator.cc
+ * @brief Defines the RVO2Simulator class.
  */
 
-#include "RVOSimulator.h"
+#include "RVO2Simulator.h"
 
 #include <limits>
 #include <utility>
@@ -51,18 +51,19 @@
 #include <omp.h>
 #endif /* _OPENMP */
 
-namespace RVO {
-const std::size_t RVO_ERROR = std::numeric_limits<std::size_t>::max();
+namespace RVO2 {
+const std::size_t RVO2_ERROR = std::numeric_limits<std::size_t>::max();
 
-RVOSimulator::RVOSimulator()
+RVO2Simulator::RVO2Simulator()
     : defaultAgent_(NULL),
       kdTree_(new KdTree(this)),
       globalTime_(0.0F),
       timeStep_(0.0F) {}
 
-RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
-                           std::size_t maxNeighbors, float timeHorizon,
-                           float timeHorizonObst, float radius, float maxSpeed)
+RVO2Simulator::RVO2Simulator(float timeStep, float neighborDist,
+                             std::size_t maxNeighbors, float timeHorizon,
+                             float timeHorizonObst, float radius,
+                             float maxSpeed)
     : defaultAgent_(new Agent()),
       kdTree_(new KdTree(this)),
       globalTime_(0.0F),
@@ -75,10 +76,10 @@ RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
   defaultAgent_->timeHorizonObst_ = timeHorizonObst;
 }
 
-RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
-                           std::size_t maxNeighbors, float timeHorizon,
-                           float timeHorizonObst, float radius, float maxSpeed,
-                           const Vector2 &velocity)
+RVO2Simulator::RVO2Simulator(float timeStep, float neighborDist,
+                             std::size_t maxNeighbors, float timeHorizon,
+                             float timeHorizonObst, float radius,
+                             float maxSpeed, const Vector2 &velocity)
     : defaultAgent_(new Agent()),
       kdTree_(new KdTree(this)),
       globalTime_(0.0F),
@@ -92,7 +93,7 @@ RVOSimulator::RVOSimulator(float timeStep, float neighborDist,
   defaultAgent_->timeHorizonObst_ = timeHorizonObst;
 }
 
-RVOSimulator::~RVOSimulator() {
+RVO2Simulator::~RVO2Simulator() {
   delete defaultAgent_;
   delete kdTree_;
 
@@ -105,7 +106,7 @@ RVOSimulator::~RVOSimulator() {
   }
 }
 
-std::size_t RVOSimulator::addAgent(const Vector2 &position) {
+std::size_t RVO2Simulator::addAgent(const Vector2 &position) {
   if (defaultAgent_ != NULL) {
     Agent *const agent = new Agent();
     agent->position_ = position;
@@ -122,21 +123,21 @@ std::size_t RVOSimulator::addAgent(const Vector2 &position) {
     return agents_.size() - 1U;
   }
 
-  return RVO_ERROR;
+  return RVO2_ERROR;
 }
 
-std::size_t RVOSimulator::addAgent(const Vector2 &position, float neighborDist,
-                                   std::size_t maxNeighbors, float timeHorizon,
-                                   float timeHorizonObst, float radius,
-                                   float maxSpeed) {
+std::size_t RVO2Simulator::addAgent(const Vector2 &position, float neighborDist,
+                                    std::size_t maxNeighbors, float timeHorizon,
+                                    float timeHorizonObst, float radius,
+                                    float maxSpeed) {
   return addAgent(position, neighborDist, maxNeighbors, timeHorizon,
                   timeHorizonObst, radius, maxSpeed, Vector2());
 }
 
-std::size_t RVOSimulator::addAgent(const Vector2 &position, float neighborDist,
-                                   std::size_t maxNeighbors, float timeHorizon,
-                                   float timeHorizonObst, float radius,
-                                   float maxSpeed, const Vector2 &velocity) {
+std::size_t RVO2Simulator::addAgent(const Vector2 &position, float neighborDist,
+                                    std::size_t maxNeighbors, float timeHorizon,
+                                    float timeHorizonObst, float radius,
+                                    float maxSpeed, const Vector2 &velocity) {
   Agent *const agent = new Agent();
   agent->position_ = position;
   agent->velocity_ = velocity;
@@ -152,7 +153,7 @@ std::size_t RVOSimulator::addAgent(const Vector2 &position, float neighborDist,
   return agents_.size() - 1U;
 }
 
-std::size_t RVOSimulator::addObstacle(const std::vector<Vector2> &vertices) {
+std::size_t RVO2Simulator::addObstacle(const std::vector<Vector2> &vertices) {
   if (vertices.size() > 1U) {
     const std::size_t obstacleNo = obstacles_.size();
 
@@ -190,10 +191,10 @@ std::size_t RVOSimulator::addObstacle(const std::vector<Vector2> &vertices) {
     return obstacleNo;
   }
 
-  return RVO_ERROR;
+  return RVO2_ERROR;
 }
 
-void RVOSimulator::doStep() {
+void RVO2Simulator::doStep() {
   kdTree_->buildAgentTree();
 
 #ifdef _OPENMP
@@ -214,106 +215,108 @@ void RVOSimulator::doStep() {
   globalTime_ += timeStep_;
 }
 
-std::size_t RVOSimulator::getAgentAgentNeighbor(std::size_t agentNo,
-                                                std::size_t neighborNo) const {
+std::size_t RVO2Simulator::getAgentAgentNeighbor(std::size_t agentNo,
+                                                 std::size_t neighborNo) const {
   return agents_[agentNo]->agentNeighbors_[neighborNo].second->id_;
 }
 
-std::size_t RVOSimulator::getAgentMaxNeighbors(std::size_t agentNo) const {
+std::size_t RVO2Simulator::getAgentMaxNeighbors(std::size_t agentNo) const {
   return agents_[agentNo]->maxNeighbors_;
 }
 
-float RVOSimulator::getAgentMaxSpeed(std::size_t agentNo) const {
+float RVO2Simulator::getAgentMaxSpeed(std::size_t agentNo) const {
   return agents_[agentNo]->maxSpeed_;
 }
 
-float RVOSimulator::getAgentNeighborDist(std::size_t agentNo) const {
+float RVO2Simulator::getAgentNeighborDist(std::size_t agentNo) const {
   return agents_[agentNo]->neighborDist_;
 }
 
-std::size_t RVOSimulator::getAgentNumAgentNeighbors(std::size_t agentNo) const {
+std::size_t RVO2Simulator::getAgentNumAgentNeighbors(
+    std::size_t agentNo) const {
   return agents_[agentNo]->agentNeighbors_.size();
 }
 
-std::size_t RVOSimulator::getAgentNumObstacleNeighbors(
+std::size_t RVO2Simulator::getAgentNumObstacleNeighbors(
     std::size_t agentNo) const {
   return agents_[agentNo]->obstacleNeighbors_.size();
 }
 
-std::size_t RVOSimulator::getAgentNumORCALines(std::size_t agentNo) const {
+std::size_t RVO2Simulator::getAgentNumORCALines(std::size_t agentNo) const {
   return agents_[agentNo]->orcaLines_.size();
 }
 
-std::size_t RVOSimulator::getAgentObstacleNeighbor(
+std::size_t RVO2Simulator::getAgentObstacleNeighbor(
     std::size_t agentNo, std::size_t neighborNo) const {
   return agents_[agentNo]->obstacleNeighbors_[neighborNo].second->id_;
 }
 
-const Line &RVOSimulator::getAgentORCALine(std::size_t agentNo,
-                                           std::size_t lineNo) const {
+const Line &RVO2Simulator::getAgentORCALine(std::size_t agentNo,
+                                            std::size_t lineNo) const {
   return agents_[agentNo]->orcaLines_[lineNo];
 }
 
-const Vector2 &RVOSimulator::getAgentPosition(std::size_t agentNo) const {
+const Vector2 &RVO2Simulator::getAgentPosition(std::size_t agentNo) const {
   return agents_[agentNo]->position_;
 }
 
-const Vector2 &RVOSimulator::getAgentPrefVelocity(std::size_t agentNo) const {
+const Vector2 &RVO2Simulator::getAgentPrefVelocity(std::size_t agentNo) const {
   return agents_[agentNo]->prefVelocity_;
 }
 
-float RVOSimulator::getAgentRadius(std::size_t agentNo) const {
+float RVO2Simulator::getAgentRadius(std::size_t agentNo) const {
   return agents_[agentNo]->radius_;
 }
 
-float RVOSimulator::getAgentTimeHorizon(std::size_t agentNo) const {
+float RVO2Simulator::getAgentTimeHorizon(std::size_t agentNo) const {
   return agents_[agentNo]->timeHorizon_;
 }
 
-float RVOSimulator::getAgentTimeHorizonObst(std::size_t agentNo) const {
+float RVO2Simulator::getAgentTimeHorizonObst(std::size_t agentNo) const {
   return agents_[agentNo]->timeHorizonObst_;
 }
 
-const Vector2 &RVOSimulator::getAgentVelocity(std::size_t agentNo) const {
+const Vector2 &RVO2Simulator::getAgentVelocity(std::size_t agentNo) const {
   return agents_[agentNo]->velocity_;
 }
 
-const Vector2 &RVOSimulator::getObstacleVertex(std::size_t vertexNo) const {
+const Vector2 &RVO2Simulator::getObstacleVertex(std::size_t vertexNo) const {
   return obstacles_[vertexNo]->point_;
 }
 
-std::size_t RVOSimulator::getNextObstacleVertexNo(std::size_t vertexNo) const {
+std::size_t RVO2Simulator::getNextObstacleVertexNo(std::size_t vertexNo) const {
   return obstacles_[vertexNo]->next_->id_;
 }
 
-std::size_t RVOSimulator::getPrevObstacleVertexNo(std::size_t vertexNo) const {
+std::size_t RVO2Simulator::getPrevObstacleVertexNo(std::size_t vertexNo) const {
   return obstacles_[vertexNo]->previous_->id_;
 }
 
-void RVOSimulator::processObstacles() { kdTree_->buildObstacleTree(); }
+void RVO2Simulator::processObstacles() { kdTree_->buildObstacleTree(); }
 
-bool RVOSimulator::queryVisibility(const Vector2 &point1,
-                                   const Vector2 &point2) const {
+bool RVO2Simulator::queryVisibility(const Vector2 &point1,
+                                    const Vector2 &point2) const {
   return kdTree_->queryVisibility(point1, point2, 0.0F);
 }
 
-bool RVOSimulator::queryVisibility(const Vector2 &point1, const Vector2 &point2,
-                                   float radius) const {
+bool RVO2Simulator::queryVisibility(const Vector2 &point1,
+                                    const Vector2 &point2, float radius) const {
   return kdTree_->queryVisibility(point1, point2, radius);
 }
 
-void RVOSimulator::setAgentDefaults(float neighborDist,
-                                    std::size_t maxNeighbors, float timeHorizon,
-                                    float timeHorizonObst, float radius,
-                                    float maxSpeed) {
+void RVO2Simulator::setAgentDefaults(float neighborDist,
+                                     std::size_t maxNeighbors,
+                                     float timeHorizon, float timeHorizonObst,
+                                     float radius, float maxSpeed) {
   setAgentDefaults(neighborDist, maxNeighbors, timeHorizon, timeHorizonObst,
                    radius, maxSpeed, Vector2());
 }
 
-void RVOSimulator::setAgentDefaults(float neighborDist,
-                                    std::size_t maxNeighbors, float timeHorizon,
-                                    float timeHorizonObst, float radius,
-                                    float maxSpeed, const Vector2 &velocity) {
+void RVO2Simulator::setAgentDefaults(float neighborDist,
+                                     std::size_t maxNeighbors,
+                                     float timeHorizon, float timeHorizonObst,
+                                     float radius, float maxSpeed,
+                                     const Vector2 &velocity) {
   if (defaultAgent_ == NULL) {
     defaultAgent_ = new Agent();
   }
@@ -327,45 +330,46 @@ void RVOSimulator::setAgentDefaults(float neighborDist,
   defaultAgent_->velocity_ = velocity;
 }
 
-void RVOSimulator::setAgentMaxNeighbors(std::size_t agentNo,
-                                        std::size_t maxNeighbors) {
+void RVO2Simulator::setAgentMaxNeighbors(std::size_t agentNo,
+                                         std::size_t maxNeighbors) {
   agents_[agentNo]->maxNeighbors_ = maxNeighbors;
 }
 
-void RVOSimulator::setAgentMaxSpeed(std::size_t agentNo, float maxSpeed) {
+void RVO2Simulator::setAgentMaxSpeed(std::size_t agentNo, float maxSpeed) {
   agents_[agentNo]->maxSpeed_ = maxSpeed;
 }
 
-void RVOSimulator::setAgentNeighborDist(std::size_t agentNo,
-                                        float neighborDist) {
+void RVO2Simulator::setAgentNeighborDist(std::size_t agentNo,
+                                         float neighborDist) {
   agents_[agentNo]->neighborDist_ = neighborDist;
 }
 
-void RVOSimulator::setAgentPosition(std::size_t agentNo,
-                                    const Vector2 &position) {
+void RVO2Simulator::setAgentPosition(std::size_t agentNo,
+                                     const Vector2 &position) {
   agents_[agentNo]->position_ = position;
 }
 
-void RVOSimulator::setAgentPrefVelocity(std::size_t agentNo,
-                                        const Vector2 &prefVelocity) {
+void RVO2Simulator::setAgentPrefVelocity(std::size_t agentNo,
+                                         const Vector2 &prefVelocity) {
   agents_[agentNo]->prefVelocity_ = prefVelocity;
 }
 
-void RVOSimulator::setAgentRadius(std::size_t agentNo, float radius) {
+void RVO2Simulator::setAgentRadius(std::size_t agentNo, float radius) {
   agents_[agentNo]->radius_ = radius;
 }
 
-void RVOSimulator::setAgentTimeHorizon(std::size_t agentNo, float timeHorizon) {
+void RVO2Simulator::setAgentTimeHorizon(std::size_t agentNo,
+                                        float timeHorizon) {
   agents_[agentNo]->timeHorizon_ = timeHorizon;
 }
 
-void RVOSimulator::setAgentTimeHorizonObst(std::size_t agentNo,
-                                           float timeHorizonObst) {
+void RVO2Simulator::setAgentTimeHorizonObst(std::size_t agentNo,
+                                            float timeHorizonObst) {
   agents_[agentNo]->timeHorizonObst_ = timeHorizonObst;
 }
 
-void RVOSimulator::setAgentVelocity(std::size_t agentNo,
-                                    const Vector2 &velocity) {
+void RVO2Simulator::setAgentVelocity(std::size_t agentNo,
+                                     const Vector2 &velocity) {
   agents_[agentNo]->velocity_ = velocity;
 }
-} /* namespace RVO */
+} /* namespace RVO2 */

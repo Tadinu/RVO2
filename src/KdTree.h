@@ -31,8 +31,8 @@
  * <https://gamma.cs.unc.edu/RVO2/>
  */
 
-#ifndef RVO_KD_TREE_H_
-#define RVO_KD_TREE_H_
+#ifndef RVO2_KD_TREE_H_
+#define RVO2_KD_TREE_H_
 
 /**
  * @file  KdTree.h
@@ -40,10 +40,10 @@
  */
 #include <vector>
 
-namespace RVO {
+namespace RVO2 {
 class Agent;
 class Obstacle;
-class RVOSimulator;
+class RVO2Simulator;
 class Vector2;
 
 /**
@@ -58,7 +58,7 @@ class KdTree {
    * @brief     Constructs a k-D tree instance.
    * @param[in] simulator The simulator instance.
    */
-  explicit KdTree(RVOSimulator *simulator);
+  explicit KdTree(RVO2Simulator *simulator);
 
   /**
    * @brief Destroys this k-D tree instance.
@@ -177,11 +177,11 @@ class KdTree {
   std::vector<Agent *> agents_;
   std::vector<AgentTreeNode> agentTree_;
   ObstacleTreeNode *obstacleTree_;
-  RVOSimulator *simulator_;
+  RVO2Simulator *simulator_;
 
   friend class Agent;
-  friend class RVOSimulator;
+  friend class RVO2Simulator;
 };
-} /* namespace RVO */
+} /* namespace RVO2 */
 
-#endif /* RVO_KD_TREE_H_ */
+#endif /* RVO2_KD_TREE_H_ */
