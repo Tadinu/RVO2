@@ -45,6 +45,7 @@ namespace RVO2 {
 class Agent;
 class KdTree;
 class Line;
+class Goal;
 class Obstacle;
 class Vector2;
 
@@ -651,12 +652,15 @@ class RVO2Simulator {
 
   std::vector<Agent *> agents_;
   std::vector<Obstacle *> obstacles_;
+  std::vector<Goal *> goals_;
   Agent *defaultAgent_;
   KdTree *kdTree_;
   float globalTime_;
   float timeStep_;
 
   friend class KdTree;
+  friend class Agent;
+  friend class Goal;
 };
 } /* namespace RVO2 */
 

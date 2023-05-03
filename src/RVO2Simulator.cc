@@ -42,6 +42,7 @@
 #include <utility>
 
 #include "Agent.h"
+#include "Goal.h"
 #include "KdTree.h"
 #include "Line.h"
 #include "Obstacle.h"
@@ -200,16 +201,18 @@ void RVO2Simulator::doStep() {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif /* _OPENMP */
-  for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
-    agents_[i]->computeNeighbors(kdTree_);
-    agents_[i]->computeNewVelocity(timeStep_);
+  for (auto &agent : agents_) {
+    agent->computePreferredVelocity();
+    agent->computeNeighbors(kdTree_);
+    // agent->computeNewVelocity(timeStep_);
+    agent->computeNewVelocity();
   }
 
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif /* _OPENMP */
-  for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
-    agents_[i]->update(timeStep_);
+  for (auto &agent : agents_) {
+    agent->update(timeStep_);
   }
 
   globalTime_ += timeStep_;

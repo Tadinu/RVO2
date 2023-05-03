@@ -43,7 +43,6 @@
 #include <limits>
 
 #include "KdTree.h"
-#include "Obstacle.h"
 
 namespace RVO2 {
 namespace {
@@ -243,13 +242,66 @@ void linearProgram3(const std::vector<Line> &lines, std::size_t numObstLines,
 } /* namespace */
 
 Agent::Agent()
-    : id_(0U),
-      maxNeighbors_(0U),
-      maxSpeed_(0.0F),
+    : simulator_(nullptr),
+      id_(0U),
+      orientation_(0.0F),
       neighborDist_(0.0F),
+      maxNeighbors_(0U),
+      maxAccel_(0.0F),
+      maxSpeed_(0.0F),
+      prefSpeed_(0.0F),
       radius_(0.0F),
+      goalRadius_(0.0F),
+      goalNo_(0U),
       timeHorizon_(0.0F),
-      timeHorizonObst_(0.0F) {}
+      timeHorizonObst_(0.0F),
+      uncertaintyOffset_(0.0F),
+      reachedGoal_(false) {}
+
+Agent::Agent(RVO2Simulator *simulator, const Vector2 &position,
+             std::size_t goalNo)
+    : simulator_(simulator),
+      id_(0U),
+      newVelocity_(simulator_->defaultAgent_->velocity_),
+      position_(position),
+      orientation_(simulator_->defaultAgent_->orientation_),
+      velocity_(simulator_->defaultAgent_->velocity_),
+      neighborDist_(simulator_->defaultAgent_->neighborDist_),
+      maxNeighbors_(simulator_->defaultAgent_->maxNeighbors_),
+      maxAccel_(simulator_->defaultAgent_->maxAccel_),
+      maxSpeed_(simulator_->defaultAgent_->maxSpeed_),
+      prefSpeed_(simulator_->defaultAgent_->prefSpeed_),
+      radius_(simulator_->defaultAgent_->radius_),
+      goalRadius_(simulator_->defaultAgent_->goalRadius_),
+      goalNo_(goalNo),
+      timeHorizon_(0.0F),
+      timeHorizonObst_(0.0F),
+      uncertaintyOffset_(simulator_->defaultAgent_->uncertaintyOffset_),
+      reachedGoal_(false) {}
+
+Agent::Agent(RVO2Simulator *simulator, const Vector2 &position,
+             std::size_t goalNo, float neighborDist, std::size_t maxNeighbors,
+             float radius, const Vector2 &velocity, float maxAccel,
+             float goalRadius, float prefSpeed, float maxSpeed,
+             float orientation, float uncertaintyOffset)
+    : simulator_(simulator),
+      id_(0U),
+      newVelocity_(velocity),
+      position_(position),
+      orientation_(orientation),
+      velocity_(velocity),
+      neighborDist_(neighborDist),
+      maxNeighbors_(maxNeighbors),
+      maxAccel_(maxAccel),
+      maxSpeed_(maxSpeed),
+      prefSpeed_(prefSpeed),
+      radius_(radius),
+      goalRadius_(goalRadius),
+      goalNo_(goalNo),
+      timeHorizon_(0.0F),
+      timeHorizonObst_(0.0F),
+      uncertaintyOffset_(uncertaintyOffset),
+      reachedGoal_(false) {}
 
 Agent::~Agent() {}
 
@@ -273,8 +325,7 @@ void Agent::computeNewVelocity(float timeStep) {
   const float invTimeHorizonObst = 1.0F / timeHorizonObst_;
 
   /* Create obstacle ORCA lines. */
-  for (std::size_t i = 0U; i < obstacleNeighbors_.size(); ++i) {
-    const Obstacle *obstacle1 = obstacleNeighbors_[i].second;
+  for (auto &[_, obstacle1] : obstacleNeighbors_) {
     const Obstacle *obstacle2 = obstacle1->next_;
 
     const Vector2 relativePosition1 = obstacle1->point_ - position_;
@@ -350,7 +401,8 @@ void Agent::computeNewVelocity(float timeStep) {
     }
 
     /* No collision. Compute legs. When obliquely viewed, both legs can come
-     * from a single vertex. Legs extend cut-off line when nonconvex vertex. */
+     * from a single vertex. Legs extend cut-off line when nonconvex vertex.
+     */
     Vector2 leftLegDirection;
     Vector2 rightLegDirection;
 
@@ -483,8 +535,8 @@ void Agent::computeNewVelocity(float timeStep) {
       continue;
     }
 
-    /* Project on left leg, right leg, or cut-off line, whichever is closest to
-     * velocity. */
+    /* Project on left leg, right leg, or cut-off line, whichever is closest
+     * to velocity. */
     const float distSqCutoff =
         (t < 0.0F || t > 1.0F || obstacle1 == obstacle2)
             ? std::numeric_limits<float>::infinity()
@@ -539,9 +591,7 @@ void Agent::computeNewVelocity(float timeStep) {
   const float invTimeHorizon = 1.0F / timeHorizon_;
 
   /* Create agent ORCA lines. */
-  for (std::size_t i = 0U; i < agentNeighbors_.size(); ++i) {
-    const Agent *const other = agentNeighbors_[i].second;
-
+  for (const auto &[_, other] : agentNeighbors_) {
     const Vector2 relativePosition = other->position_ - position_;
     const Vector2 relativeVelocity = velocity_ - other->velocity_;
     const float distSq = absSq(relativePosition);
@@ -613,6 +663,313 @@ void Agent::computeNewVelocity(float timeStep) {
 
   if (lineFail < orcaLines_.size()) {
     linearProgram3(orcaLines_, numObstLines, lineFail, maxSpeed_, newVelocity_);
+  }
+}
+
+void Agent::computeNewVelocity() {
+  velocityObstacles_.clear();
+  velocityObstacles_.reserve(agentNeighbors_.size());
+
+  VelocityObstacle velocityObstacle;
+
+  for (const auto &[_, other] : agentNeighbors_) {
+    const Vector2 relativePosition = position_ - other->position_;
+    const Vector2 relativeVelocity = velocity_ - other->velocity_;
+    const float combinedRadius = radius_ + other->radius_;
+
+    if (absSq(relativePosition) > combinedRadius * combinedRadius) {
+      const float angle = atan(relativePosition);
+      const float openingAngle =
+          std::asin((combinedRadius) / abs(relativePosition));
+
+      velocityObstacle.side1_ = Vector2(std::cos(angle - openingAngle),
+                                        std::sin(angle - openingAngle));
+      velocityObstacle.side2_ = Vector2(std::cos(angle + openingAngle),
+                                        std::sin(angle + openingAngle));
+
+      const float d = 2.0F * std::sin(openingAngle) * std::cos(openingAngle);
+
+      if (det(relativePosition, prefVelocity_ - other->prefVelocity_) > 0.0F) {
+        const float s =
+            0.5F * det(relativeVelocity, velocityObstacle.side2_) / d;
+
+        velocityObstacle.apex_ =
+            other->velocity_ + s * velocityObstacle.side1_ -
+            (uncertaintyOffset_ * abs(relativePosition) / (combinedRadius)) *
+                normalize(relativePosition);
+      } else {
+        const float s =
+            0.5F * det(relativeVelocity, velocityObstacle.side1_) / d;
+
+        velocityObstacle.apex_ =
+            other->velocity_ + s * velocityObstacle.side2_ -
+            (uncertaintyOffset_ * abs(relativePosition) / (combinedRadius)) *
+                normalize(relativePosition);
+      }
+
+      velocityObstacles_.push_back(velocityObstacle);
+    } else {
+      velocityObstacle.apex_ =
+          0.5F * (other->velocity_ + velocity_) -
+          (uncertaintyOffset_ + 0.5F *
+                                    (combinedRadius - abs(relativePosition)) /
+                                    simulator_->timeStep_) *
+              normalize(relativePosition);
+      velocityObstacle.side1_ = normal(position_, other->position_);
+      velocityObstacle.side2_ = -velocityObstacle.side1_;
+      velocityObstacles_.push_back(velocityObstacle);
+    }
+  }
+
+  candidates_.clear();
+
+  Candidate candidate;
+
+  candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
+  candidate.velocityObstacle2_ = std::numeric_limits<int>::max();
+
+  if (absSq(prefVelocity_) < maxSpeed_ * maxSpeed_) {
+    candidate.position_ = prefVelocity_;
+  } else {
+    candidate.position_ = maxSpeed_ * normalize(prefVelocity_);
+  }
+
+  candidates_.insert(
+      std::make_pair(absSq(prefVelocity_ - candidate.position_), candidate));
+
+  for (int i = 0; i < static_cast<int>(velocityObstacles_.size()); ++i) {
+    candidate.velocityObstacle1_ = i;
+    candidate.velocityObstacle2_ = i;
+
+    const float dotProduct1 = (prefVelocity_ - velocityObstacles_[i].apex_) *
+                              velocityObstacles_[i].side1_;
+    const float dotProduct2 = (prefVelocity_ - velocityObstacles_[i].apex_) *
+                              velocityObstacles_[i].side2_;
+
+    if (dotProduct1 > 0.0F &&
+        det(velocityObstacles_[i].side1_,
+            prefVelocity_ - velocityObstacles_[i].apex_) > 0.0F) {
+      candidate.position_ = velocityObstacles_[i].apex_ +
+                            dotProduct1 * velocityObstacles_[i].side1_;
+
+      if (absSq(candidate.position_) < maxSpeed_ * maxSpeed_) {
+        candidates_.insert(std::make_pair(
+            absSq(prefVelocity_ - candidate.position_), candidate));
+      }
+    }
+
+    if (dotProduct2 > 0.0F &&
+        det(velocityObstacles_[i].side2_,
+            prefVelocity_ - velocityObstacles_[i].apex_) < 0.0F) {
+      candidate.position_ = velocityObstacles_[i].apex_ +
+                            dotProduct2 * velocityObstacles_[i].side2_;
+
+      if (absSq(candidate.position_) < maxSpeed_ * maxSpeed_) {
+        candidates_.insert(std::make_pair(
+            absSq(prefVelocity_ - candidate.position_), candidate));
+      }
+    }
+  }
+
+  for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j) {
+    candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
+    candidate.velocityObstacle2_ = j;
+
+    float d = det(velocityObstacles_[j].apex_, velocityObstacles_[j].side1_);
+    float discriminant = maxSpeed_ * maxSpeed_ - d * d;
+
+    if (discriminant > 0.0F) {
+      const float t1 =
+          -(velocityObstacles_[j].apex_ * velocityObstacles_[j].side1_) +
+          std::sqrt(discriminant);
+      const float t2 =
+          -(velocityObstacles_[j].apex_ * velocityObstacles_[j].side1_) -
+          std::sqrt(discriminant);
+
+      if (t1 >= 0.0F) {
+        candidate.position_ =
+            velocityObstacles_[j].apex_ + t1 * velocityObstacles_[j].side1_;
+        candidates_.insert(std::make_pair(
+            absSq(prefVelocity_ - candidate.position_), candidate));
+      }
+
+      if (t2 >= 0.0F) {
+        candidate.position_ =
+            velocityObstacles_[j].apex_ + t2 * velocityObstacles_[j].side1_;
+        candidates_.insert(std::make_pair(
+            absSq(prefVelocity_ - candidate.position_), candidate));
+      }
+    }
+
+    d = det(velocityObstacles_[j].apex_, velocityObstacles_[j].side2_);
+    discriminant = maxSpeed_ * maxSpeed_ - d * d;
+
+    if (discriminant > 0.0F) {
+      const float t1 =
+          -(velocityObstacles_[j].apex_ * velocityObstacles_[j].side2_) +
+          std::sqrt(discriminant);
+      const float t2 =
+          -(velocityObstacles_[j].apex_ * velocityObstacles_[j].side2_) -
+          std::sqrt(discriminant);
+
+      if (t1 >= 0.0F) {
+        candidate.position_ =
+            velocityObstacles_[j].apex_ + t1 * velocityObstacles_[j].side2_;
+        candidates_.insert(std::make_pair(
+            absSq(prefVelocity_ - candidate.position_), candidate));
+      }
+
+      if (t2 >= 0.0F) {
+        candidate.position_ =
+            velocityObstacles_[j].apex_ + t2 * velocityObstacles_[j].side2_;
+        candidates_.insert(std::make_pair(
+            absSq(prefVelocity_ - candidate.position_), candidate));
+      }
+    }
+  }
+
+  for (int i = 0; i < static_cast<int>(velocityObstacles_.size()) - 1; ++i) {
+    for (int j = i + 1; j < static_cast<int>(velocityObstacles_.size()); ++j) {
+      candidate.velocityObstacle1_ = i;
+      candidate.velocityObstacle2_ = j;
+
+      float d = det(velocityObstacles_[i].side1_, velocityObstacles_[j].side1_);
+
+      if (d != 0.0F) {
+        const float s =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[j].side1_) /
+            d;
+        const float t =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[i].side1_) /
+            d;
+
+        if (s >= 0.0F && t >= 0.0F) {
+          candidate.position_ =
+              velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
+
+          if (absSq(candidate.position_) < maxSpeed_ * maxSpeed_) {
+            candidates_.insert(std::make_pair(
+                absSq(prefVelocity_ - candidate.position_), candidate));
+          }
+        }
+      }
+
+      d = det(velocityObstacles_[i].side2_, velocityObstacles_[j].side1_);
+
+      if (d != 0.0F) {
+        const float s =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[j].side1_) /
+            d;
+        const float t =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[i].side2_) /
+            d;
+
+        if (s >= 0.0F && t >= 0.0F) {
+          candidate.position_ =
+              velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
+
+          if (absSq(candidate.position_) < maxSpeed_ * maxSpeed_) {
+            candidates_.insert(std::make_pair(
+                absSq(prefVelocity_ - candidate.position_), candidate));
+          }
+        }
+      }
+
+      d = det(velocityObstacles_[i].side1_, velocityObstacles_[j].side2_);
+
+      if (d != 0.0F) {
+        const float s =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[j].side2_) /
+            d;
+        const float t =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[i].side1_) /
+            d;
+
+        if (s >= 0.0F && t >= 0.0F) {
+          candidate.position_ =
+              velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
+
+          if (absSq(candidate.position_) < maxSpeed_ * maxSpeed_) {
+            candidates_.insert(std::make_pair(
+                absSq(prefVelocity_ - candidate.position_), candidate));
+          }
+        }
+      }
+
+      d = det(velocityObstacles_[i].side2_, velocityObstacles_[j].side2_);
+
+      if (d != 0.0F) {
+        const float s =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[j].side2_) /
+            d;
+        const float t =
+            det(velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_,
+                velocityObstacles_[i].side2_) /
+            d;
+
+        if (s >= 0.0F && t >= 0.0F) {
+          candidate.position_ =
+              velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
+
+          if (absSq(candidate.position_) < maxSpeed_ * maxSpeed_) {
+            candidates_.insert(std::make_pair(
+                absSq(prefVelocity_ - candidate.position_), candidate));
+          }
+        }
+      }
+    }
+  }
+
+  int optimal = -1;
+
+  for (std::multimap<float, Candidate>::const_iterator iter =
+           candidates_.begin();
+       iter != candidates_.end(); ++iter) {
+    candidate = iter->second;
+    bool valid = true;
+
+    for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j) {
+      if (j != candidate.velocityObstacle1_ &&
+          j != candidate.velocityObstacle2_ &&
+          det(velocityObstacles_[j].side2_,
+              candidate.position_ - velocityObstacles_[j].apex_) < 0.0F &&
+          det(velocityObstacles_[j].side1_,
+              candidate.position_ - velocityObstacles_[j].apex_) > 0.0F) {
+        valid = false;
+
+        if (j > optimal) {
+          optimal = j;
+          newVelocity_ = candidate.position_;
+        }
+
+        break;
+      }
+    }
+
+    if (valid) {
+      newVelocity_ = candidate.position_;
+      break;
+    }
+  }
+}
+
+void Agent::computePreferredVelocity() {
+  const Vector2 relativeGoalPosition =
+      simulator_->goals_[goalNo_]->position_ - position_;
+  const float distSqToGoal = absSq(relativeGoalPosition);
+  const float prefDist = prefSpeed_ * simulator_->timeStep_;
+
+  if (prefDist * prefDist > distSqToGoal) {
+    prefVelocity_ = relativeGoalPosition / simulator_->timeStep_;
+  } else {
+    prefVelocity_ = prefSpeed_ * relativeGoalPosition / std::sqrt(distSqToGoal);
   }
 }
 

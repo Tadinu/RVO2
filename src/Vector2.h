@@ -238,6 +238,17 @@ float absSq(const Vector2 &vector);
 
 /**
  * @relates   Vector2
+ * @brief     Computes the angle between a specified vector and the positive
+ *            x-axis.
+ * @param[in] vector The vector whose angle with the positive x-axis is to be
+ *                   calculated.
+ * @return    The angle in radians between the vector and the positive x-axis in
+ *            the range [-PI, PI].
+ */
+float atan(const Vector2 &vector);
+
+/**
+ * @relates   Vector2
  * @brief     Computes the determinant of a two-dimensional square matrix with
  *            rows consisting of the specified two-dimensional vectors.
  * @param[in] vector1 The top row of the two-dimensional square matrix.
@@ -268,6 +279,16 @@ float leftOf(const Vector2 &vector1, const Vector2 &vector2,
  * @return    The normalization of the two-dimensional vector.
  */
 Vector2 normalize(const Vector2 &vector);
+
+/**
+ * @relates   Vector2
+ * @brief     Computes the normal to a line segment with the specified end
+ *            points.
+ * @param[in] vector1 The first end point of the line segment.
+ * @param[in] vector2 The second end point of the line segment.
+ * @return    The normal vector of the line segment.
+ */
+Vector2 normal(const Vector2 &vector1, const Vector2 &vector2);
 } /* namespace RVO2 */
 
 #endif /* RVO2_VECTOR2_H_ */

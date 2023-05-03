@@ -38,7 +38,8 @@ set(RVO2_HEADERS
   Line.h
   RVO2.h
   RVO2Simulator.h
-  Vector2.h)
+  Vector2.h
+  Goal.h)
 
 set(RVO2_SOURCES
   Agent.cc
@@ -46,6 +47,8 @@ set(RVO2_SOURCES
   Export.cc
   KdTree.cc
   KdTree.h
+  Goal.cc
+  Goal.h
   Line.cc
   Obstacle.cc
   Obstacle.h

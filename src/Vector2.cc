@@ -123,6 +123,8 @@ float abs(const Vector2 &vector) { return std::sqrt(vector * vector); }
 
 float absSq(const Vector2 &vector) { return vector * vector; }
 
+float atan(const Vector2 &vector) { return std::atan2(vector.y(), vector.x()); }
+
 float det(const Vector2 &vector1, const Vector2 &vector2) {
   return vector1.x() * vector2.y() - vector1.y() * vector2.x();
 }
@@ -133,4 +135,9 @@ float leftOf(const Vector2 &vector1, const Vector2 &vector2,
 }
 
 Vector2 normalize(const Vector2 &vector) { return vector / abs(vector); }
+
+Vector2 normal(const Vector2 &vector1, const Vector2 &vector2) {
+  return normalize(
+      Vector2(vector2.y() - vector1.y(), vector1.x() - vector2.x()));
+}
 } /* namespace RVO2 */
